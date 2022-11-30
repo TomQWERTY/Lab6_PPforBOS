@@ -10,18 +10,15 @@ int Method_1(int* mas, int size)
 	const int part_count = 10;
 	int part_sums[part_count] = {};
 	int part_length = size / part_count;
+	int sum = 0;
+#pragma omp parallel for reduction(+:sum)
 	for (int i = 0; i < part_count; i++)
 	{
 		int part_adder = i * part_length;
 		for (int j = 0; j < part_length; j++)
 		{
-			part_sums[i] += mas[part_adder + j];
+			sum += mas[part_adder + j];
 		}
-	}
-	int sum = 0;
-	for (int i = 0; i < part_count; i++)
-	{
-		sum += part_sums[i];
 	}
 	return sum;
 }
@@ -56,7 +53,7 @@ int main()
 	sum = Method_1(mas, size);
 	cout << "Method 1 sum: " << sum << endl;
 
-	sum = Method_1(mas, size);
+	sum = Method_2(mas, size);
 	cout << "Method 2 sum: " << sum << endl;
 
 	return 0;
