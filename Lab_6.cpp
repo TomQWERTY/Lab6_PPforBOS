@@ -2,6 +2,7 @@
 //
 
 #include <iostream>
+#include <omp.h>
 
 using namespace std;
 
@@ -23,10 +24,11 @@ int Method_1(int* mas, int size)
 	return sum;
 }
 
-int Method_2(int* mas, int size)
+/*int Method_2(int* mas, int size)
 {
 	do
 	{
+#pragma omp parallel for
 		for (int i = 0; i < size / 2; i++)
 		{
 			int end = size - 1 - i;
@@ -37,10 +39,32 @@ int Method_2(int* mas, int size)
 	int sum = mas[0];
 	return sum;
 }
+*/
+
+int Method_2(int* mas, int size_given)
+{
+#pragma omp parallel num_threads(size_given / 2)
+	{
+		int i = omp_get_thread_num();
+		int size = size_given;
+		do
+		{
+			if (i < size / 2)
+			{
+				int end = size - 1 - i;
+				mas[i] += mas[end];
+			}
+#pragma omp barrier
+			size = size / 2 + size % 2;
+		} while (size > 1);
+	}
+	int sum = mas[0];
+	return sum;
+}
 
 int main()
 {
-	const int size = 2000;
+	const int size = 900;
 	int mas[size] = {};
 	int sum = 0;
 	for (int i = 0; i < size; i++)
