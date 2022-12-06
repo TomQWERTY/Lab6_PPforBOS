@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <omp.h>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 
@@ -64,7 +66,7 @@ int Method_2(int* mas, int size_given)
 
 int main()
 {
-	const int size = 900;
+	const int size = 1000;
 	int mas[size] = {};
 	int sum = 0;
 	for (int i = 0; i < size; i++)
@@ -79,6 +81,24 @@ int main()
 
 	sum = Method_2(mas, size);
 	cout << "Method 2 sum: " << sum << endl;
+
+	srand(time(NULL));
+	int ind = rand() % 1000;
+	int min = -20;
+	mas[ind] = -20;
+	cout << "Negative " << min << " number is on " << ind << " position" << endl;
+	ind = -1;
+	min = INT_MAX;
+#pragma omp parallel for
+	for (int i = 0; i < size; i++)
+	{
+		if (mas[i] < min)
+		{
+			min = mas[i];
+			ind = i;
+		}
+	}
+	cout << "Minimal number is " << min << " on " << ind << " position" << endl;
 
 	return 0;
 }
